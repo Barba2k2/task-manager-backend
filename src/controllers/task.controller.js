@@ -1,6 +1,9 @@
-const { model } = require("mongoose");
+const { model, mongoose } = require("mongoose");
 const TaskModel = require("../models/task.model");
-const { nofFoundError } = require("../errors/mongodb.errors");
+const {
+  nofFoundError,
+  objectIdCastError,
+} = require("../errors/mongodb.errors");
 const { notAllowedFieldsToUpdateError } = require("../errors/general.errors");
 
 class TaskController {
@@ -29,6 +32,9 @@ class TaskController {
 
       return this.res.status(200).send(task);
     } catch (error) {
+      if (error instanceof mongoose.Error.CastError) {
+        return objectIdCastError(this.res);
+      }
       this.res.status(500).send(error.message);
     }
   }
@@ -67,6 +73,9 @@ class TaskController {
       await taskToUpdate.save();
       return this.res.status(201).send(taskToUpdate);
     } catch (error) {
+      if (error instanceof mongoose.Error.CastError) {
+        return objectIdCastError(this.res);
+      }
       this.res.status(500).send(error.message);
       console.error(error);
     }
