@@ -54,7 +54,7 @@ class TaskController {
       const allowedUpdates = ["isCompleted"];
       const requestedUpdates = Object.keys(taskData);
 
-      for (update of requestedUpdates) {
+      for (const update of requestedUpdates) {
         if (allowedUpdates.includes(update)) {
           taskToUpdate[update] = taskData[update];
         } else {
