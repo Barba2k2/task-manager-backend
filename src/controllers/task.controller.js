@@ -1,5 +1,6 @@
 const { model } = require("mongoose");
 const TaskModel = require("../models/task.model");
+const { nofFoundError } = require("../errors/mongodb.errors");
 
 class TaskController {
   constructor(req, res) {
@@ -23,9 +24,7 @@ class TaskController {
 
       const task = await TaskModel.findById(taskId);
 
-      if (!task) {
-        return this.res.status(404).send("Task not found!");
-      }
+      if (!task) return nofFoundError(this.res);
 
       return this.res.status(200).send(task);
     } catch (error) {
@@ -51,6 +50,8 @@ class TaskController {
 
       const taskToUpdate = await TaskModel.findById(taskId);
 
+      if (!taskToUpdate) return nofFoundError(this.res);
+
       const allowedUpdates = ["isCompleted"];
       const requestedUpdates = Object.keys(taskData);
 
@@ -58,7 +59,9 @@ class TaskController {
         if (allowedUpdates.includes(update)) {
           taskToUpdate[update] = taskData[update];
         } else {
-          return this.res.status(500).send("One or more fields are not editable!");
+          return this.res
+            .status(500)
+            .send("One or more fields are not editable!");
         }
       }
 
@@ -76,9 +79,7 @@ class TaskController {
 
       const taskToDelete = await TaskModel.findById(taskId);
 
-      if (!taskToDelete) {
-        return this.res.status(404).send("Task not found!");
-      }
+      if (!taskToDelete) return nofFoundError(this.res);
 
       const deletedTask = await TaskModel.findByIdAndDelete(taskToDelete);
 
