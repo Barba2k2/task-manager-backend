@@ -1,8 +1,8 @@
 const express = require("express");
 const dotenv = require("dotenv");
+const TaskRouter = require("./src/routes/task.routes");
 
 const connectToDatabse = require("./src/databse/mongoose.database");
-const TaskModel = require("./src/models/task.model");
 
 dotenv.config();
 
@@ -11,26 +11,6 @@ app.use(express.json());
 
 connectToDatabse();
 
-app.get("/tasks", async (req, res) => {
-  try {
-    const tasks = await TaskModel.find({});
-    res.status(200).send(tasks);
-  } catch (error) {
-    res.status(500).send(error.message);
-    console.error(error);
-  }
-});
-
-app.post("/tasks", async (req, res) => {
-  try {
-    const newTask = new TaskModel(req.body);
-
-    await newTask.save();
-    res.status(201).send(newTask);
-  } catch (error) {
-    res.status(500).send(error.message);
-    console.error(error);
-  }
-});
+app.use("/tasks", TaskRouter);
 
 app.listen(8000, () => console.log("Listening on port 8000!"));
